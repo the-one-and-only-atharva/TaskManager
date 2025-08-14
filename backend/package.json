@@ -1,0 +1,28 @@
+{
+  "name": "taskmanager-backend",
+  "version": "1.0.0",
+  "description": "Backend API for TaskManager - Orbital Task Management System",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["taskmanager", "api", "express", "nodejs"],
+  "author": "TaskManager Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "express-rate-limit": "^7.1.5",
+    "uuid": "^9.0.1",
+    "joi": "^17.11.0",
+    "compression": "^1.7.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
