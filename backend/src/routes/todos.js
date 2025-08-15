@@ -1,5 +1,4 @@
 import express from 'express';
-import { supabase } from '../config/database.js';
 import { authenticateUser } from '../middleware/auth.js';
 import { createTodoSchema, updateTodoSchema } from '../validation/schemas.js';
 
@@ -8,7 +7,7 @@ const router = express.Router();
 // Get all todos for a moon
 router.get('/moon/:moonId', authenticateUser, async (req, res, next) => {
   try {
-    const { data: todos, error } = await supabase
+    const { data: todos, error } = await req.userClient
       .from('todos')
       .select(`
         *,
@@ -37,7 +36,7 @@ router.get('/moon/:moonId', authenticateUser, async (req, res, next) => {
 // Get single todo by ID
 router.get('/:id', authenticateUser, async (req, res, next) => {
   try {
-    const { data: todo, error } = await supabase
+    const { data: todo, error } = await req.userClient
       .from('todos')
       .select(`
         *,
@@ -73,7 +72,7 @@ router.get('/:id', authenticateUser, async (req, res, next) => {
 // Create new todo
 router.post('/', authenticateUser, async (req, res, next) => {
   try {
-    const { error: validationError, value } = createTodoSchema.validate(req.body);
+    const { error: validationError, value } = createTodoSchema.validate(req.body, { stripUnknown: true });
     if (validationError) {
       return res.status(400).json({
         error: 'Validation error',
@@ -82,7 +81,7 @@ router.post('/', authenticateUser, async (req, res, next) => {
     }
 
     // Verify the moon belongs to the user
-    const { data: moon, error: moonError } = await supabase
+    const { data: moon, error: moonError } = await req.userClient
       .from('moons')
       .select(`
         id,
@@ -101,7 +100,7 @@ router.post('/', authenticateUser, async (req, res, next) => {
       });
     }
 
-    const { data: todo, error } = await supabase
+    const { data: todo, error } = await req.userClient
       .from('todos')
       .insert([value])
       .select()
@@ -122,7 +121,7 @@ router.post('/', authenticateUser, async (req, res, next) => {
 // Update todo
 router.put('/:id', authenticateUser, async (req, res, next) => {
   try {
-    const { error: validationError, value } = updateTodoSchema.validate(req.body);
+    const { error: validationError, value } = updateTodoSchema.validate(req.body, { stripUnknown: true });
     if (validationError) {
       return res.status(400).json({
         error: 'Validation error',
@@ -130,7 +129,7 @@ router.put('/:id', authenticateUser, async (req, res, next) => {
       });
     }
 
-    const { data: todo, error } = await supabase
+    const { data: todo, error } = await req.userClient
       .from('todos')
       .update(value)
       .eq('id', req.params.id)
@@ -169,7 +168,7 @@ router.put('/:id', authenticateUser, async (req, res, next) => {
 router.patch('/:id/toggle', authenticateUser, async (req, res, next) => {
   try {
     // First get the current todo
-    const { data: currentTodo, error: fetchError } = await supabase
+    const { data: currentTodo, error: fetchError } = await req.userClient
       .from('todos')
       .select(`
         completed,
@@ -194,7 +193,7 @@ router.patch('/:id/toggle', authenticateUser, async (req, res, next) => {
     }
 
     // Toggle the completion status
-    const { data: todo, error } = await supabase
+    const { data: todo, error } = await req.userClient
       .from('todos')
       .update({ 
         completed: !currentTodo.completed,
@@ -234,7 +233,7 @@ router.patch('/reorder', authenticateUser, async (req, res, next) => {
       order_index: index,
     }));
 
-    const { data: todos, error } = await supabase
+    const { data: todos, error } = await req.userClient
       .from('todos')
       .upsert(updates, { onConflict: 'id' })
       .select(`
@@ -262,7 +261,7 @@ router.patch('/reorder', authenticateUser, async (req, res, next) => {
 // Delete todo
 router.delete('/:id', authenticateUser, async (req, res, next) => {
   try {
-    const { error } = await supabase
+    const { error } = await req.userClient
       .from('todos')
       .delete()
       .eq('id', req.params.id)

@@ -32,9 +32,9 @@ export const createUserClient = (accessToken) => {
 // Test database connection
 export const testConnection = async () => {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('stars')
-      .select('count')
+      .select('id', { count: 'exact', head: true })
       .limit(1);
     
     if (error) {

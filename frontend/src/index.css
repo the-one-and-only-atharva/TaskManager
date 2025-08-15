@@ -7,3 +7,12 @@ body {
 html, body {
   overscroll-behavior: none;
 }
+
+/* Global pointer cues for clickable elements */
+button, [role="button"], a, .cursor-pointer { cursor: pointer; }
+
+/* Smooth page transitions for route wrapper as a baseline */
+.page-enter { opacity: 0; transform: translateY(6px); }
+.page-enter-active { opacity: 1; transform: translateY(0); transition: opacity .18s ease-out, transform .18s ease-out; }
+.page-exit { opacity: 1; transform: translateY(0); }
+.page-exit-active { opacity: 0; transform: translateY(-6px); transition: opacity .18s ease-out, transform .18s ease-out; }

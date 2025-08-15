@@ -1,5 +1,4 @@
 import express from 'express';
-import { supabase } from '../config/database.js';
 import { authenticateUser } from '../middleware/auth.js';
 import { createPlanetSchema, updatePlanetSchema } from '../validation/schemas.js';
 
@@ -9,7 +8,7 @@ const router = express.Router();
 router.get('/star/:starId', authenticateUser, async (req, res, next) => {
   try {
     // First verify the star belongs to the user
-    const { data: star, error: starError } = await supabase
+    const { data: star, error: starError } = await req.userClient
       .from('stars')
       .select('id')
       .eq('id', req.params.starId)
@@ -23,7 +22,7 @@ router.get('/star/:starId', authenticateUser, async (req, res, next) => {
       });
     }
 
-    const { data: planets, error } = await supabase
+    const { data: planets, error } = await req.userClient
       .from('planets')
       .select(`
         *,
@@ -53,7 +52,7 @@ router.get('/star/:starId', authenticateUser, async (req, res, next) => {
 // Get single planet by ID
 router.get('/:id', authenticateUser, async (req, res, next) => {
   try {
-    const { data: planet, error } = await supabase
+    const { data: planet, error } = await req.userClient
       .from('planets')
       .select(`
         *,
@@ -92,7 +91,7 @@ router.get('/:id', authenticateUser, async (req, res, next) => {
 // Create new planet
 router.post('/', authenticateUser, async (req, res, next) => {
   try {
-    const { error: validationError, value } = createPlanetSchema.validate(req.body);
+    const { error: validationError, value } = createPlanetSchema.validate(req.body, { stripUnknown: true });
     if (validationError) {
       return res.status(400).json({
         error: 'Validation error',
@@ -101,7 +100,7 @@ router.post('/', authenticateUser, async (req, res, next) => {
     }
 
     // Verify the star belongs to the user
-    const { data: star, error: starError } = await supabase
+    const { data: star, error: starError } = await req.userClient
       .from('stars')
       .select('id')
       .eq('id', value.star_id)
@@ -115,7 +114,7 @@ router.post('/', authenticateUser, async (req, res, next) => {
       });
     }
 
-    const { data: planet, error } = await supabase
+    const { data: planet, error } = await req.userClient
       .from('planets')
       .insert([value])
       .select()
@@ -136,7 +135,7 @@ router.post('/', authenticateUser, async (req, res, next) => {
 // Update planet
 router.put('/:id', authenticateUser, async (req, res, next) => {
   try {
-    const { error: validationError, value } = updatePlanetSchema.validate(req.body);
+    const { error: validationError, value } = updatePlanetSchema.validate(req.body, { stripUnknown: true });
     if (validationError) {
       return res.status(400).json({
         error: 'Validation error',
@@ -144,7 +143,7 @@ router.put('/:id', authenticateUser, async (req, res, next) => {
       });
     }
 
-    const { data: planet, error } = await supabase
+    const { data: planet, error } = await req.userClient
       .from('planets')
       .update(value)
       .eq('id', req.params.id)
@@ -178,7 +177,7 @@ router.put('/:id', authenticateUser, async (req, res, next) => {
 // Delete planet
 router.delete('/:id', authenticateUser, async (req, res, next) => {
   try {
-    const { error } = await supabase
+    const { error } = await req.userClient
       .from('planets')
       .delete()
       .eq('id', req.params.id)

@@ -25,6 +25,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Basic hardening
+app.disable('x-powered-by');
+if (process.env.TRUST_PROXY?.toLowerCase() === 'true') {
+  app.set('trust proxy', 1);
+}
+
 // Security middleware
 app.use(helmet({
   crossOriginEmbedderPolicy: false,
@@ -52,7 +58,7 @@ app.use(limiter);
 
 // CORS configuration
 const corsOrigins = process.env.CORS_ORIGINS 
-  ? process.env.CORS_ORIGINS.split(',')
+  ? process.env.CORS_ORIGINS.split(',').map(o => o.trim()).filter(Boolean)
   : ['http://localhost:5173', 'http://localhost:3000'];
 
 app.use(cors({

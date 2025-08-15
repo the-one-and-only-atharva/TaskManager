@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence, Reorder } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  Reorder,
+  useReducedMotion,
+} from "framer-motion";
 import TodoItem from "./TodoItem";
 import { getMoonSvg } from "../../constants/space";
 
@@ -13,6 +18,7 @@ const TodoList = ({
   moonIconIndex = 0,
 }) => {
   const [editingId, setEditingId] = useState(null);
+  const reduceMotion = useReducedMotion();
 
   const handleEditStart = (id) => {
     setEditingId(id);
@@ -67,10 +73,15 @@ const TodoList = ({
             <Reorder.Item
               key={todo.id}
               value={todo}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.2 }}
+              initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+              animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -20 }}
+              transition={{
+                duration: 0.2,
+                type: reduceMotion ? "tween" : "spring",
+                stiffness: 400,
+                damping: 30,
+              }}
             >
               <TodoItem
                 todo={todo}

@@ -11,6 +11,14 @@ export const authenticateUser = async (req, res, next) => {
       });
     }
 
+    if (!process.env.SUPABASE_ANON_KEY) {
+      console.error('Missing SUPABASE_ANON_KEY environment variable');
+      return res.status(500).json({
+        error: 'Server misconfiguration',
+        message: 'Authentication is not configured on the server'
+      });
+    }
+
     const token = authHeader.substring(7);
     const userClient = createUserClient(token);
     
@@ -40,6 +48,9 @@ export const optionalAuth = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     
     if (authHeader && authHeader.startsWith('Bearer ')) {
+      if (!process.env.SUPABASE_ANON_KEY) {
+        return next();
+      }
       const token = authHeader.substring(7);
       const userClient = createUserClient(token);
       

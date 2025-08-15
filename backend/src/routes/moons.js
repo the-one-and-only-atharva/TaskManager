@@ -1,5 +1,4 @@
 import express from 'express';
-import { supabase } from '../config/database.js';
 import { authenticateUser } from '../middleware/auth.js';
 import { createMoonSchema, updateMoonSchema } from '../validation/schemas.js';
 
@@ -8,7 +7,7 @@ const router = express.Router();
 // Get all moons for a planet
 router.get('/planet/:planetId', authenticateUser, async (req, res, next) => {
   try {
-    const { data: moons, error } = await supabase
+    const { data: moons, error } = await req.userClient
       .from('moons')
       .select(`
         *,
@@ -36,7 +35,7 @@ router.get('/planet/:planetId', authenticateUser, async (req, res, next) => {
 // Get single moon by ID
 router.get('/:id', authenticateUser, async (req, res, next) => {
   try {
-    const { data: moon, error } = await supabase
+    const { data: moon, error } = await req.userClient
       .from('moons')
       .select(`
         *,
@@ -71,7 +70,7 @@ router.get('/:id', authenticateUser, async (req, res, next) => {
 // Create new moon
 router.post('/', authenticateUser, async (req, res, next) => {
   try {
-    const { error: validationError, value } = createMoonSchema.validate(req.body);
+    const { error: validationError, value } = createMoonSchema.validate(req.body, { stripUnknown: true });
     if (validationError) {
       return res.status(400).json({
         error: 'Validation error',
@@ -80,7 +79,7 @@ router.post('/', authenticateUser, async (req, res, next) => {
     }
 
     // Verify the planet belongs to the user
-    const { data: planet, error: planetError } = await supabase
+    const { data: planet, error: planetError } = await req.userClient
       .from('planets')
       .select(`
         id,
@@ -97,7 +96,7 @@ router.post('/', authenticateUser, async (req, res, next) => {
       });
     }
 
-    const { data: moon, error } = await supabase
+    const { data: moon, error } = await req.userClient
       .from('moons')
       .insert([value])
       .select()
@@ -118,7 +117,7 @@ router.post('/', authenticateUser, async (req, res, next) => {
 // Update moon
 router.put('/:id', authenticateUser, async (req, res, next) => {
   try {
-    const { error: validationError, value } = updateMoonSchema.validate(req.body);
+    const { error: validationError, value } = updateMoonSchema.validate(req.body, { stripUnknown: true });
     if (validationError) {
       return res.status(400).json({
         error: 'Validation error',
@@ -126,7 +125,7 @@ router.put('/:id', authenticateUser, async (req, res, next) => {
       });
     }
 
-    const { data: moon, error } = await supabase
+    const { data: moon, error } = await req.userClient
       .from('moons')
       .update(value)
       .eq('id', req.params.id)
@@ -162,7 +161,7 @@ router.put('/:id', authenticateUser, async (req, res, next) => {
 // Delete moon
 router.delete('/:id', authenticateUser, async (req, res, next) => {
   try {
-    const { error } = await supabase
+    const { error } = await req.userClient
       .from('moons')
       .delete()
       .eq('id', req.params.id)

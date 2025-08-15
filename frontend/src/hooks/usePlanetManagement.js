@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { apiFetch } from "../lib/api.js";
 
 /**
  * Custom hook for managing planet state and CRUD operations
@@ -149,10 +150,37 @@ export const usePlanetManagement = (star, selectedItem, setStar) => {
 
   const removeLink = (id) => {
     const current = selectedPlanet?.links ?? [];
-    setPlanetField(
-      "links",
-      current.filter((l) => l.id !== id)
-    );
+    const next = current.filter((link) => link.id !== id);
+    setPlanetField("links", next);
+  };
+
+  // Delete planet function
+  const deletePlanet = async () => {
+    if (selectedItem?.type !== "planet") return;
+    if (!selectedPlanet?.id) return;
+    
+    try {
+      // Make API call to delete planet
+      await apiFetch(`/api/planets/${selectedPlanet.id}`, {
+        method: "DELETE",
+      });
+      
+      // Update local state after successful deletion
+      setStar?.((prev) => {
+        const copy = { ...(prev || {}) };
+        const planets = [...(copy.planets || [])];
+        const pIndex = selectedPlanetIndex;
+        if (pIndex >= 0) {
+          planets.splice(pIndex, 1);
+          copy.planets = planets;
+        }
+        return copy;
+      });
+    } catch (error) {
+      console.error("Failed to delete planet:", error);
+      // You might want to show an error message to the user here
+      throw error;
+    }
   };
 
   // Tags management
@@ -170,42 +198,33 @@ export const usePlanetManagement = (star, selectedItem, setStar) => {
   };
 
   return {
-    // State
-    newOutcomeLabel,
-    setNewOutcomeLabel,
-    newOutcomeTarget,
-    setNewOutcomeTarget,
-    newMilestoneName,
-    setNewMilestoneName,
-    newMilestoneDue,
-    setNewMilestoneDue,
-    newLinkTitle,
-    setNewLinkTitle,
-    newLinkUrl,
-    setNewLinkUrl,
-    
-    // Selected planet info
     selectedPlanet,
     selectedPlanetIndex,
-    otherPlanets,
-    
-    // Update functions
-    updatePlanet,
     setPlanetField,
     setStarField,
     reorderPlanet,
     toggleDependency,
-    
-    // CRUD operations
+    otherPlanets,
     addOutcome,
     removeOutcome,
+    newOutcomeLabel,
+    setNewOutcomeLabel,
+    newOutcomeTarget,
+    setNewOutcomeTarget,
     addMilestone,
     removeMilestone,
+    newMilestoneName,
+    setNewMilestoneName,
+    newMilestoneDue,
+    setNewMilestoneDue,
     addLink,
     removeLink,
-    
-    // Tags
+    newLinkTitle,
+    setNewLinkTitle,
+    newLinkUrl,
+    setNewLinkUrl,
     tagsString,
     onTagsChange,
+    deletePlanet,
   };
 };

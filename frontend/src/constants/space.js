@@ -11,8 +11,6 @@ import neptuneSvg from "../assets/neptune.svg";
 import moonSvg from "../assets/moon.svg";
 import blueMoonSvg from "../assets/blue-moon.svg";
 import meteorSvg from "../assets/meteor.svg";
-import greenAsteroidSvg from "../assets/green-asteroid.svg";
-import orangeAsteroidSvg from "../assets/orange-asteroid.svg";
 
 // SVG Collections
 export const PLANET_SVGS = [
@@ -28,8 +26,6 @@ export const MOON_SVGS = [
   moonSvg,
   blueMoonSvg,
   meteorSvg,
-  greenAsteroidSvg,
-  orangeAsteroidSvg,
 ];
 
 // Helper functions

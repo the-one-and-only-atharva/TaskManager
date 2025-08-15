@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import SystemPreview from "./SystemPreview";
 import TodoEditor from "./TodoEditor";
 
-const SystemEditor = ({ star, onClose, onSave, onDeleteStar }) => {
+const SystemEditor = ({ star, onClose, onSave, onDeleteStar, onRefresh }) => {
   const [name, setName] = useState(star?.name ?? "");
   const [selectedItem, setSelectedItem] = useState(null);
   const [draftStar, setDraftStar] = useState(star);
@@ -21,6 +21,28 @@ const SystemEditor = ({ star, onClose, onSave, onDeleteStar }) => {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  // Handle refresh after deletions
+  const handleRefresh = () => {
+    // Reset selected item since it might have been deleted
+    setSelectedItem(null);
+
+    // Update draft star to match the refreshed star data
+    if (star) {
+      setDraftStar(star);
+    }
+
+    // Notify parent to refresh
+    onRefresh?.();
+  };
+
+  // Effect to sync draft star with actual star data
+  useEffect(() => {
+    if (star && draftStar?.id !== star.id) {
+      setDraftStar(star);
+      setSelectedItem(null);
+    }
+  }, [star, draftStar?.id]);
 
   return (
     <AnimatePresence>
@@ -71,6 +93,7 @@ const SystemEditor = ({ star, onClose, onSave, onDeleteStar }) => {
                 onDelete={onDeleteStar}
                 selectedItem={selectedItem}
                 setStar={setDraftStar}
+                onRefresh={handleRefresh}
               />
             </div>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { getMoonSvg } from "../../constants/space";
 
 const TodoItem = ({
@@ -17,6 +17,7 @@ const TodoItem = ({
   const [editText, setEditText] = useState(todo.text);
   const [isExpanded, setIsExpanded] = useState(false);
   const itemRef = useRef(null);
+  const reduceMotion = useReducedMotion();
 
   const handleEditStart = () => {
     setEditText(todo.text);
@@ -61,33 +62,33 @@ const TodoItem = ({
   return (
     <motion.div
       ref={itemRef}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
+      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+      animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -20 }}
       transition={{ duration: 0.2 }}
       className="group relative"
     >
       <div
         className={`
-          relative p-4 rounded-xl border transition-all duration-300 max-w-[95%] mx-auto
-          ${
+				  relative p-4 rounded-xl border transition-all duration-300 max-w-[95%] mx-auto
+				  ${
             todo.completed
               ? "bg-white/5 border-white/5 text-white/60"
               : "bg-white/10 border-white/15 text-white/90 hover:bg-white/15 hover:border-white/25"
           }
-          backdrop-blur-sm hover:shadow-lg hover:shadow-white/5
-        `}
+				  backdrop-blur-sm hover:shadow-lg hover:shadow-white/5
+				`}
       >
         {/* Background gradient effect */}
         <div
           className={`
-            absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none
-            ${
+					  absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none
+					  ${
               todo.completed
                 ? "bg-gradient-to-r from-green-500/10 to-emerald-500/10"
                 : "bg-gradient-to-r from-blue-500/10 to-purple-500/10"
             }
-          `}
+					`}
         />
 
         {/* Content */}
@@ -96,18 +97,19 @@ const TodoItem = ({
           <button
             onClick={() => onToggle(todo.id)}
             className={`
-              flex-shrink-0 w-5 h-5 rounded-full border-2 transition-all duration-200
-              ${
+						  flex-shrink-0 w-5 h-5 rounded-full border-2 transition-all duration-200
+						  ${
                 todo.completed
                   ? "bg-emerald-500/80 border-emerald-400/60"
                   : "border-white/30 hover:border-white/50"
               }
-              hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/30
-            `}
+						  hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/30
+						`}
+            aria-pressed={todo.completed}
           >
             {todo.completed && (
               <motion.svg
-                initial={{ scale: 0 }}
+                initial={reduceMotion ? false : { scale: 0 }}
                 animate={{ scale: 1 }}
                 className="w-full h-full text-white"
                 viewBox="0 0 24 24"
@@ -132,9 +134,10 @@ const TodoItem = ({
             ) : (
               <div
                 className={`
-                  text-sm leading-relaxed transition-all duration-200
-                  ${todo.completed ? "line-through opacity-70" : ""}
-                `}
+								  text-sm leading-relaxed transition-all duration-200
+								  ${todo.completed ? "line-through opacity-70" : ""}
+								`}
+                onDoubleClick={handleEditStart}
               >
                 {todo.text}
               </div>
@@ -258,9 +261,11 @@ const TodoItem = ({
         {/* Expandable Task Details */}
         {isExpanded && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
+            animate={
+              reduceMotion ? { opacity: 1 } : { opacity: 1, height: "auto" }
+            }
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
             className="relative z-20 mt-4 pt-4 border-t border-white/10 space-y-4"
           >

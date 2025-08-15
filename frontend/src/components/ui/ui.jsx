@@ -126,3 +126,56 @@ export const FormField = ({ label, children, className = "" }) => {
     </div>
   );
 };
+
+// Confirmation dialog component (glassy, rounded-3xl)
+export const ConfirmationDialog = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = "Delete",
+  cancelText = "Cancel",
+  variant = "danger",
+  disabled = false,
+}) => {
+  if (!isOpen) return null;
+
+  const confirmVariant = {
+    danger:
+      "bg-red-500/20 text-red-200 border border-red-400/30 hover:bg-red-500/30 hover:border-red-400/50",
+    warning:
+      "bg-yellow-500/20 text-yellow-200 border border-yellow-400/30 hover:bg-yellow-500/30 hover:border-yellow-400/50",
+    info: "bg-blue-500/20 text-blue-200 border border-blue-400/30 hover:bg-blue-500/30 hover:border-blue-400/50",
+  }[variant];
+
+  return (
+    <ModalOverlay
+      onClose={onClose}
+      className="bg-none bg-transparent border-0 shadow-none"
+    >
+      <div className="rounded-3xl bg-white/10 backdrop-blur-lg p-6 border border-white/20 shadow-2xl max-w-md w-full">
+        <h3 className="text-xl font-semibold text-white/90 mb-3">{title}</h3>
+        <p className="text-white/70 mb-6">{message}</p>
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={onClose}
+            disabled={disabled}
+            className="px-4 py-2 rounded-lg bg-white/10 text-white/80 hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {cancelText}
+          </button>
+          <button
+            onClick={() => {
+              onConfirm?.();
+            }}
+            disabled={disabled}
+            className={`px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${confirmVariant}`}
+          >
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </ModalOverlay>
+  );
+};

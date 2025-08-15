@@ -1,5 +1,4 @@
 import express from 'express';
-import { supabase } from '../config/database.js';
 import { authenticateUser } from '../middleware/auth.js';
 import { createStarSchema, updateStarSchema } from '../validation/schemas.js';
 
@@ -8,7 +7,7 @@ const router = express.Router();
 // Get all stars for authenticated user
 router.get('/', authenticateUser, async (req, res, next) => {
   try {
-    const { data: stars, error } = await supabase
+    const { data: stars, error } = await req.userClient
       .from('stars')
       .select(`
         *,
@@ -41,7 +40,7 @@ router.get('/', authenticateUser, async (req, res, next) => {
 // Get single star by ID
 router.get('/:id', authenticateUser, async (req, res, next) => {
   try {
-    const { data: star, error } = await supabase
+    const { data: star, error } = await req.userClient
       .from('stars')
       .select(`
         *,
@@ -82,7 +81,7 @@ router.get('/:id', authenticateUser, async (req, res, next) => {
 // Create new star
 router.post('/', authenticateUser, async (req, res, next) => {
   try {
-    const { error: validationError, value } = createStarSchema.validate(req.body);
+    const { error: validationError, value } = createStarSchema.validate(req.body, { stripUnknown: true });
     if (validationError) {
       return res.status(400).json({
         error: 'Validation error',
@@ -90,7 +89,7 @@ router.post('/', authenticateUser, async (req, res, next) => {
       });
     }
 
-    const { data: star, error } = await supabase
+    const { data: star, error } = await req.userClient
       .from('stars')
       .insert([{
         ...value,
@@ -114,7 +113,7 @@ router.post('/', authenticateUser, async (req, res, next) => {
 // Update star
 router.put('/:id', authenticateUser, async (req, res, next) => {
   try {
-    const { error: validationError, value } = updateStarSchema.validate(req.body);
+    const { error: validationError, value } = updateStarSchema.validate(req.body, { stripUnknown: true });
     if (validationError) {
       return res.status(400).json({
         error: 'Validation error',
@@ -122,7 +121,7 @@ router.put('/:id', authenticateUser, async (req, res, next) => {
       });
     }
 
-    const { data: star, error } = await supabase
+    const { data: star, error } = await req.userClient
       .from('stars')
       .update(value)
       .eq('id', req.params.id)
@@ -153,7 +152,7 @@ router.put('/:id', authenticateUser, async (req, res, next) => {
 // Delete star
 router.delete('/:id', authenticateUser, async (req, res, next) => {
   try {
-    const { error } = await supabase
+    const { error } = await req.userClient
       .from('stars')
       .delete()
       .eq('id', req.params.id)

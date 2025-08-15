@@ -13,6 +13,7 @@ import TodoInput from "../todo/TodoInput";
 import TodoList from "../todo/TodoList";
 import TodoStats from "../todo/TodoStats";
 import { getMoonSvg, getPlanetSvg } from "../../constants/space";
+import { ConfirmationDialog } from "../ui/ui";
 
 const TodoEditor = ({
   star,
@@ -23,7 +24,13 @@ const TodoEditor = ({
   onDelete,
   selectedItem,
   setStar,
+  onRefresh,
 }) => {
+  // State for confirmation dialogs
+  const [showPlanetDeleteConfirm, setShowPlanetDeleteConfirm] = useState(false);
+  const [showMoonDeleteConfirm, setShowMoonDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // Use custom hooks
   const planetManagement = usePlanetManagement(star, selectedItem, setStar);
   const moonManagement = useMoonManagement(star, selectedItem, setStar);
@@ -115,9 +122,31 @@ const TodoEditor = ({
                       className="w-full h-full filter drop-shadow-lg"
                     />
                   </div>
-                  <div className="text-white/90 font-medium text-3xl">
-                    Editing Planet: {selectedPlanet?.name}
+                  <div className="flex-1">
+                    <div className="text-white/90 font-medium text-3xl">
+                      Editing Planet: {selectedPlanet?.name}
+                    </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowPlanetDeleteConfirm(true)}
+                    className="px-3 py-2 rounded-xl bg-red-500/20 text-red-200 border border-red-400/30 hover:bg-red-500/30 hover:border-red-400/50 focus:outline-none focus:ring-2 focus:ring-red-400/30 transition-all duration-200 hover:scale-105"
+                    title="Delete planet"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
                 </div>
                 {/* Basic Info */}
                 <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
@@ -405,7 +434,7 @@ const TodoEditor = ({
                       className="w-full h-full filter drop-shadow-lg"
                     />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <div className="text-white/90 font-medium text-2xl">
                       {moonManagement.selectedMoon?.name || "Unnamed Moon"}
                     </div>
@@ -413,6 +442,26 @@ const TodoEditor = ({
                       Task Management Hub
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowMoonDeleteConfirm(true)}
+                    className="px-3 py-2 rounded-xl bg-red-500/20 text-red-200 border border-red-400/30 hover:bg-red-500/30 hover:border-red-400/50 focus:outline-none focus:ring-2 focus:ring-red-400/30 transition-all duration-200 hover:scale-105"
+                    title="Delete moon"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
                 </div>
 
                 {/* Simple Moon Info */}
@@ -504,9 +553,7 @@ const TodoEditor = ({
                   onEdit={moonManagement.editTodo}
                   onDelete={moonManagement.deleteTodo}
                   onUpdateField={moonManagement.updateTodoField}
-                  onReorder={(newOrder) => {
-                    moonManagement.setMoonField("todos", newOrder);
-                  }}
+                  onReorder={moonManagement.reorderTodosByNewList}
                   moonIconIndex={selectedItem.moonIndex || 0}
                 />
               </motion.div>
@@ -540,6 +587,61 @@ const TodoEditor = ({
           </button>
         </div>
       </div>
+
+      {/* Confirmation Dialogs */}
+      <ConfirmationDialog
+        isOpen={showPlanetDeleteConfirm}
+        onClose={() => setShowPlanetDeleteConfirm(false)}
+        onConfirm={async () => {
+          try {
+            setIsDeleting(true);
+            await planetManagement.deletePlanet();
+            onClose?.();
+            onRefresh?.(); // Refresh parent UI after deletion
+          } catch (error) {
+            console.error("Failed to delete planet:", error);
+            // You could show a toast notification here
+            alert("Failed to delete planet. Please try again.");
+          } finally {
+            setIsDeleting(false);
+            setShowPlanetDeleteConfirm(false);
+          }
+        }}
+        title="Delete Planet"
+        message={`Are you sure you want to delete the planet "${
+          selectedPlanet?.name || "Unnamed Planet"
+        }"? This will also delete all associated moons and tasks.`}
+        confirmText={isDeleting ? "Deleting..." : "Delete Planet"}
+        variant="danger"
+        disabled={isDeleting}
+      />
+
+      <ConfirmationDialog
+        isOpen={showMoonDeleteConfirm}
+        onClose={() => setShowMoonDeleteConfirm(false)}
+        onConfirm={async () => {
+          try {
+            setIsDeleting(true);
+            await moonManagement.deleteMoon();
+            onClose?.();
+            onRefresh?.(); // Refresh parent UI after deletion
+          } catch (error) {
+            console.error("Failed to delete moon:", error);
+            // You could show a toast notification here
+            alert("Failed to delete moon. Please try again.");
+          } finally {
+            setIsDeleting(false);
+            setShowMoonDeleteConfirm(false);
+          }
+        }}
+        title="Delete Moon"
+        message={`Are you sure you want to delete the moon "${
+          moonManagement.selectedMoon?.name || "Unnamed Moon"
+        }"? This will also delete all associated tasks.`}
+        confirmText={isDeleting ? "Deleting..." : "Delete Moon"}
+        variant="danger"
+        disabled={isDeleting}
+      />
     </div>
   );
 };
