@@ -1,34 +1,32 @@
-# TaskManager - Orbital Task Management System
+# TaskManager: Orbital Task Management System
 
-A revolutionary task management application that transforms productivity through space-themed orbital interfaces and immersive 3D visualizations.
+A vibe coded task management application that transforms productivity through space-themed orbital interfaces.
 
-## 🌟 What Makes This Special?
+Disclaimer: I just wanted to see for myself whether AI assisted progamming really works. You will find lots of bugs and issues, and frankly, some extremely stupid code. I will create another app like this one, but try to minimize my use of AI. Hopefully, that version is better written and more delightful to use.
 
-TaskManager isn't just another todo app - it's an **interactive space adventure** for your productivity. Navigate through tasks as if you're exploring a solar system, with each task represented as a celestial body orbiting around your goals.
+## What Makes This Special?
 
-## 🚀 Key Features
+TaskManager isn't just another todo app, it's an **interactive space adventure** for your productivity. Navigate through tasks as if you're exploring a solar system, with each task represented as a celestial body orbiting around your goals.
+
+## Key Features
 
 - **🌌 Orbital Task Visualization**: Tasks orbit around central themes like planets around a sun
 - **🎯 Interactive 3D Canvas**: Drag, zoom, and pan through your task universe
 - **⚡ Priority System**: Visual priority indicators with space-themed icons (meteor, asteroid, planet)
 - **🔄 Status Tracking**: Monitor task progress through different orbital states
 - **🎨 Beautiful UI**: Modern, responsive design built with Tailwind CSS
-- **📱 Mobile Friendly**: Works seamlessly across all devices
 - **🎭 Smooth Animations**: Framer Motion powered interactions for delightful UX
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Frontend**: React 19 + Vite for lightning-fast development
 - **Styling**: Tailwind CSS for beautiful, responsive design
-- **3D Graphics**: Three.js + React Three Fiber for immersive experiences
-- **Canvas**: Konva.js for high-performance 2D graphics
 - **Animations**: Framer Motion for smooth, engaging interactions
 - **Drag & Drop**: @dnd-kit for intuitive task management
-- **State Management**: Custom React hooks for clean, maintainable code
 
-## 📱 Screenshots & Demo
+## Screenshots & Demo
 
-*Coming soon - interactive demo and screenshots will be added here*
+*Coming soon, interactive demo and screenshots will be added here*
 
 ## 🚀 Quick Start
 
@@ -70,11 +68,10 @@ TaskManager/
 └── README.md                # This file
 ```
 
-## 🎯 Use Cases
+## Use Cases
 
 - **Project Management**: Organize complex projects with visual task relationships
 - **Personal Productivity**: Transform daily tasks into an engaging space adventure
-- **Team Collaboration**: Share task universes with team members
 - **Goal Setting**: Visualize long-term goals as central stars with supporting tasks as orbiting planets
 
 ## 🔮 Future Roadmap
@@ -114,7 +111,6 @@ This project is licensed under the MIT License - see the [LICENSE](frontend/LICE
 
 - **React Team** for the amazing framework
 - **Tailwind CSS** for the beautiful styling system
-- **Three.js Community** for 3D graphics capabilities
 - **Space Enthusiasts** everywhere for inspiration
 
 ## 📞 Support
